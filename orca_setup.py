@@ -1,27 +1,15 @@
 from orca_sim import OrcaHandRightCubeOrientation
-import time
+import torch
 
-env = OrcaHandRightCubeOrientation(
-    version="v2",
-    initial_red_face="random",
-    cube_pos_xy_jitter=0.01,
-    render_mode="human",  # if supported
-)
+env = OrcaHandRightCubeOrientation(version="v2", render_mode="human")
 
-obs, info = env.reset(seed=0)
-
-print("Observation:", obs)
+nominal = env.nominal_reset_options()
+obs, info = env.reset(options=nominal)
 
 for step in range(1000):
-    action = env.action_space.sample()  # random action
-
+    action = torch.zeros(env.action_space.shape, dtype=torch.float32).numpy()
     obs, reward, terminated, truncated, info = env.step(action)
-
-    env.render()  # if rendering is not automatic
-
     if terminated or truncated:
         obs, info = env.reset()
-
-    time.sleep(0.02)  # slow things down so you can see it
 
 env.close()
